@@ -1,0 +1,53 @@
+# Xcode
+build/
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xcscmblueprint
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Archives
+*.xcarchive
+
+# Swift Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Xcode automatically generated files
+*.moved-aside
+*.xcuserstate
+
+# iOS Device logs
+*.mobileprovision
+*.ipa
+
+# macOS Finder files
+.DS_Store
+
+# Temporary files
+*.swp
+*.lock
+*.tmp
+
+# Other
+*.orig
