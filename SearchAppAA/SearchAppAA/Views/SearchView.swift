@@ -17,7 +17,7 @@ struct SearchView: View {
                 ZStack {
                     VStack(spacing: AppLayout.searchContentSpacing) {
                         
-                        TopHalfView(height: half)
+                        HeaderView(height: half)
                             .frame(height: half)
                         
                         ZStack {
@@ -36,7 +36,7 @@ struct SearchView: View {
     }
 }
 
-struct TopHalfView: View {
+struct HeaderView: View {
     let height: CGFloat
     
     var body: some View {
