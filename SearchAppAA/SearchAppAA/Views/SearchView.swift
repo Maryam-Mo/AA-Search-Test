@@ -97,6 +97,7 @@ struct SearchBar: View {
                     .tint(AppColors.textPrimary)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
+                    .accessibilityIdentifier("searchField")
             }
         }
         .padding()
@@ -114,8 +115,8 @@ struct MovieListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading) {
-                ForEach(viewModel.movies) { movie in
-                    movieRow(for: movie)
+                ForEach(Array(viewModel.movies.enumerated()), id: \.1.id) { index, movie in
+                  movieRow(for: movie, at: index)
                 }
                 if viewModel.movies.count <= AppLayout.defaultResultsCount {
                     ShowMoreButton {
@@ -157,7 +158,7 @@ struct MovieListView: View {
     
     
     @ViewBuilder
-    private func movieRow(for movie: Movie) -> some View {
+    private func movieRow(for movie: Movie, at index: Int) -> some View {
         Button {
             viewModel.addHistory(movie: movie)
             selectedMovie = movie
@@ -169,6 +170,7 @@ struct MovieListView: View {
                 .padding(.horizontal, AppLayout.defaultPadding)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("movieRow_\(index)")
     }
 }
 

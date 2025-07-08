@@ -145,6 +145,7 @@ private struct BottomButton: View {
                 .background(AppColors.backButtonColor)
                 .clipShape(Capsule())
                 .foregroundColor(AppColors.textPrimary)
+                .accessibilityIdentifier("detailBackButton")
         }
     }
 }
