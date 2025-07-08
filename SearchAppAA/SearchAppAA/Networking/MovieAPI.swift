@@ -13,7 +13,7 @@ protocol MovieRepository {
         query: String,
         page: Int,
         perPage: Int
-    ) -> AnyPublisher<[Movie], Error>
+    ) -> AnyPublisher<[Movie], MovieAPIError>
 }
 
 final class MovieAPI: MovieRepository {
@@ -40,10 +40,12 @@ final class MovieAPI: MovieRepository {
         query: String,
         page: Int,
         perPage: Int
-    ) -> AnyPublisher<[Movie], Error> {
+    ) -> AnyPublisher<[Movie], MovieAPIError> {
         
-        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
-        components?.queryItems = [
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+            return Fail(error: .invalidURL).eraseToAnyPublisher()
+        }
+        components.queryItems = [
             URLQueryItem(name: "api_key", value: apiKey),
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "page", value: String(page)),
@@ -52,7 +54,9 @@ final class MovieAPI: MovieRepository {
             URLQueryItem(name: "region", value: "US")
         ]
         
-        let url = (components?.url)!
+        guard let url = components.url else {
+            return Fail(error: .invalidURL).eraseToAnyPublisher()
+        }
         
         let request = URLRequest(url: url)
         
@@ -62,14 +66,29 @@ final class MovieAPI: MovieRepository {
         
         return urlSession.dataTaskPublisher(for: request)
             .tryMap { output in
-                guard let http = output.response as? HTTPURLResponse,
-                      200..<300 ~= http.statusCode
-                else {
-                    throw URLError(.badServerResponse)
+                guard let http = output.response as? HTTPURLResponse else {
+                    throw MovieAPIError.error(URLError(.badServerResponse))
+                }
+                guard 200..<300 ~= http.statusCode else {
+                    throw MovieAPIError.badResponse(statusCode: http.statusCode)
                 }
                 return output.data
             }
+            .mapError { error in
+                if let apiError = error as? MovieAPIError {
+                    return apiError
+                } else {
+                    return MovieAPIError.error(error)
+                }
+            }
             .decode(type: Response.self, decoder: decoder)
+            .mapError { error in
+                if let apiError = error as? MovieAPIError {
+                    return apiError
+                } else {
+                    return MovieAPIError.decoding(error)
+                }
+            }
             .map { response in
                 let start = 0
                 let end = min(perPage, response.results.count)
