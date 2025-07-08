@@ -14,7 +14,7 @@ protocol MovieRepository {
 
 final class MovieAPI: MovieRepository {
     private let apiKey: String
-    private let baseURL = URL(string: "https://api.themoviedb.org/3/search/movie")!
+    private let baseURL: URL
     private let urlSession: URLSessionType
     private let decoder: JSONDecoder
     
@@ -28,6 +28,10 @@ final class MovieAPI: MovieRepository {
         }()
     ) {
         self.apiKey = apiKey
+        guard let url = URL(string: "https://api.themoviedb.org/3/search/movie") else {
+          fatalError("❌ MovieAPI: invalid base URL")
+        }
+        self.baseURL = url
         self.urlSession = urlSession
         self.decoder = decoder
     }
