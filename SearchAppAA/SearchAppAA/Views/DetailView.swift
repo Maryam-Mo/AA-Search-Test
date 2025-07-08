@@ -31,6 +31,10 @@ struct DetailView: View {
                 }
                 .frame(maxHeight: .infinity)
 
+                BottomButton(title: "Back") {
+                    dismiss()
+                }
+                .padding(.bottom, AppLayout.defaultPadding)
             }
             .ignoresSafeArea(.keyboard)
             .padding(.horizontal, AppLayout.defaultPadding)
@@ -124,6 +128,23 @@ private struct StatisticsSection: View {
             Text(value)
                 .font(AppFonts.caption)
                 .foregroundColor(AppColors.textSecondary)
+        }
+    }
+}
+
+private struct BottomButton: View {
+    let title: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(AppFonts.title16)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(AppColors.backButtonColor)
+                .clipShape(Capsule())
+                .foregroundColor(AppColors.textPrimary)
         }
     }
 }

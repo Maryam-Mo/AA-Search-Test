@@ -16,4 +16,5 @@ enum AppColors {
     static let indicatorInactive = Color.white.opacity(0.7)
     static let listBackground = Color(white: 0.15)
     static let dividerColor = Color.white.opacity(0.3)
+    static let backButtonColor = Color(red: 48/255, green: 79/255, blue: 254/255)
 }
