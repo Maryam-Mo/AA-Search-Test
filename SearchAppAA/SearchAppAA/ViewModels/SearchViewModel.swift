@@ -12,7 +12,8 @@ import Combine
 class SearchViewModel: ObservableObject {
     @Published var query: String = ""
     @Published private(set) var movies: [Movie] = []
-    
+    @Published private(set) var errorMessage: String?
+
     private let api: MovieRepository
     
     private var cancellables = Set<AnyCancellable>()
@@ -37,12 +38,21 @@ class SearchViewModel: ObservableObject {
             return
         }
         
+        errorMessage = nil
+        
         searchCancellable?.cancel()
         searchCancellable = api.searchMovies(query: query, page: 1, perPage: perPage)
             .receive(on: RunLoop.main)
             .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
             } receiveValue: { [weak self] movies in
                 self?.movies = movies
             }
+    }
+    
+    func showMore() async {
+        await search(perPage: AppLayout.maxResultsCount)
     }
 }

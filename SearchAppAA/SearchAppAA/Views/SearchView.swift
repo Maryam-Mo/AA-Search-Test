@@ -27,7 +27,7 @@ struct SearchView: View {
                             }
                         }
                         .frame(height: half, alignment: .top)
-
+                        
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -63,7 +63,7 @@ struct HeaderView: View {
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
             .padding(.bottom, AppLayout.defaultPadding)
-
+            
             SearchBar(query: $viewModel.query) {
                 Task { await viewModel.search() }
             }
@@ -122,6 +122,11 @@ struct MovieListView: View {
                 ForEach(viewModel.movies) { movie in
                     movieRow(for: movie)
                 }
+                if viewModel.movies.count <= AppLayout.defaultResultsCount {
+                    ShowMoreButton {
+                        Task { await viewModel.showMore() }
+                    }
+                }
             }
             .padding(.top, AppLayout.defaultPadding)
             .background(
@@ -152,6 +157,27 @@ struct MovieListView: View {
                 .padding(.horizontal, AppLayout.defaultPadding)
         }
         .buttonStyle(.plain)
+    }
+}
+
+struct ShowMoreButton: View {
+    let action: () -> Void
+    var body: some View {
+        Button(action: action) {
+            Text("Show more")
+                .font(AppFonts.title16)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.clear)
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(AppColors.textSecondary, lineWidth: 1)
+                )
+                .foregroundColor(AppColors.textSecondary)
+        }
+        .padding(.bottom, AppLayout.defaultPadding)
+        .padding(.horizontal, AppLayout.defaultPadding)
     }
 }
 

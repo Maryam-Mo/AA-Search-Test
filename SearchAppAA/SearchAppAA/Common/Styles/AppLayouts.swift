@@ -17,5 +17,7 @@ enum AppLayout {
     static let indicatorActiveWidth: CGFloat = 16
     static let indicatorInactiveWidth: CGFloat = 37
     static let searchHeight: CGFloat = 50
+    static let defaultResultsCount: Int = 5
+    static let maxResultsCount: Int = 10
 }
 
