@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SearchHistory: Identifiable, Codable {
+struct SearchHistory: Identifiable, Codable, Equatable {
     let id: UUID
     let movie: Movie
     let date: Date
