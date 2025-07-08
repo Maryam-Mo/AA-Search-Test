@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SearchView: View {
+    @StateObject private var viewModel = SearchViewModel()
+
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
@@ -17,7 +19,7 @@ struct SearchView: View {
                 ZStack {
                     VStack(spacing: AppLayout.searchContentSpacing) {
                         
-                        HeaderView(height: half)
+                        HeaderView(viewModel: viewModel, height: half)
                             .frame(height: half)
                         
                         ZStack {
@@ -31,12 +33,14 @@ struct SearchView: View {
                 .background(AppColors.background)
                 .navigationBarHidden(true)
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
 struct HeaderView: View {
+    @ObservedObject var viewModel: SearchViewModel
     let height: CGFloat
     
     var body: some View {
@@ -53,14 +57,17 @@ struct HeaderView: View {
                 .font(AppFonts.title2)
                 .foregroundColor(AppColors.textPrimary)
             
-            SearchBar()
+            SearchBar(query: $viewModel.query) {
+                Task { await viewModel.search() }
+            }
             .frame(minHeight: AppLayout.searchHeight)
         }
     }
 }
 
 struct SearchBar: View {
-    var query: String = ""
+    @Binding var query: String
+    var onCommit: () -> Void
     
     var body: some View {
         HStack {
@@ -70,6 +77,12 @@ struct SearchBar: View {
                         .font(AppFonts.title16)
                         .foregroundColor(AppColors.textSecondary)
                 }
+                TextField("", text: $query, onCommit: onCommit)
+                    .font(AppFonts.title16)
+                    .foregroundColor(AppColors.textPrimary)
+                    .tint(AppColors.textPrimary)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
             }
         }
         .padding()

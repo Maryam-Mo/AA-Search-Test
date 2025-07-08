@@ -71,7 +71,9 @@ final class MovieAPI: MovieRepository {
             }
             .decode(type: Response.self, decoder: decoder)
             .map { response in
-                return Array(response.results)
+                let start = 0
+                let end = min(perPage, response.results.count)
+                return Array(response.results[start..<end])
             }
             .eraseToAnyPublisher()
     }
