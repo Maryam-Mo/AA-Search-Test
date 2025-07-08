@@ -19,7 +19,7 @@ class SearchViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var searchCancellable: AnyCancellable?
     
-    init(api: MovieAPI = MovieAPI(apiKey: Config.appAPIKey)) {
+    init(api: MovieRepository = MovieAPI(apiKey: Config.appAPIKey)) {
         self.api = api
         
         $query
