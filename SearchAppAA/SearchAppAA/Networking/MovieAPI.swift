@@ -9,17 +9,13 @@ import Foundation
 import Combine
 
 protocol MovieRepository {
-    func searchMovies(
-        query: String,
-        page: Int,
-        perPage: Int
-    ) -> AnyPublisher<[Movie], MovieAPIError>
+    func searchMovies(query: String, page: Int, perPage: Int) -> AnyPublisher<[Movie], MovieAPIError>
 }
 
 final class MovieAPI: MovieRepository {
     private let apiKey: String
     private let baseURL = URL(string: "https://api.themoviedb.org/3/search/movie")!
-    private let urlSession: URLSession
+    private let urlSession: URLSessionType
     private let decoder: JSONDecoder
     
     init(
