@@ -14,4 +14,5 @@ enum AppColors {
     static let bodySecondary = Color.white.opacity(0.8)
     static let indicatorActive = Color.blue
     static let indicatorInactive = Color.white.opacity(0.7)
+    static let listBackground = Color(white: 0.15)
 }

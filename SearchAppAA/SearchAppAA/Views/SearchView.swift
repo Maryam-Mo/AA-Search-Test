@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchView: View {
     @StateObject private var viewModel = SearchViewModel()
-
+    
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
@@ -20,11 +20,13 @@ struct SearchView: View {
                     VStack(spacing: AppLayout.searchContentSpacing) {
                         
                         HeaderView(viewModel: viewModel, height: half)
-                            .frame(height: half)
                         
-                        ZStack {
+                        ZStack(alignment: .top) {
+                            if !viewModel.movies.isEmpty {
+                                MovieListView(viewModel: viewModel, height: half)
+                            }
                         }
-                        .frame(height: half)
+                        .frame(height: half, alignment: .top)
 
                     }
                 }
@@ -44,24 +46,31 @@ struct HeaderView: View {
     let height: CGFloat
     
     var body: some View {
-        VStack(spacing: AppLayout.searchContentSpacing) {
-            Spacer(minLength: AppLayout.smallVerticalSpacing)
-            Image("SearchIcon")
-                .resizable()
-                .scaledToFit()
-                .frame(height: height * 0.3)
-            
-            IndicatorView()
-            
-            Text("Search for a movie")
-                .font(AppFonts.title2)
-                .foregroundColor(AppColors.textPrimary)
-            
+        VStack(spacing: 0) {
+            VStack(spacing: AppLayout.smallVerticalSpacing) {
+                Image("SearchIcon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: height * 0.3)
+                
+                IndicatorView()
+                
+                Spacer().frame(height: AppLayout.smallVerticalSpacing)
+                
+                Text("Search for a movie")
+                    .font(AppFonts.title2)
+                    .foregroundColor(AppColors.textPrimary)
+            }
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, AppLayout.defaultPadding)
+
             SearchBar(query: $viewModel.query) {
                 Task { await viewModel.search() }
             }
             .frame(minHeight: AppLayout.searchHeight)
+            .frame(maxWidth: .infinity)
         }
+        .frame(height: height)
     }
 }
 
@@ -101,6 +110,58 @@ struct IndicatorView: View {
     }
 }
 
+struct MovieListView: View {
+    @ObservedObject var viewModel: SearchViewModel
+    let height: CGFloat
+    @State private var selectedMovie: Movie?
+    @State private var contentHeight: CGFloat = .zero
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading) {
+                ForEach(viewModel.movies) { movie in
+                    movieRow(for: movie)
+                }
+            }
+            .padding(.top, AppLayout.defaultPadding)
+            .background(
+                GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: ContentHeightKey.self,
+                                    value: geometry.size.height)
+                }
+            )
+        }
+        .frame(height: min(contentHeight, height))
+        .background(AppColors.listBackground)
+        .cornerRadius(AppLayout.cornerRadius)
+        .onPreferenceChange(ContentHeightKey.self) {
+            contentHeight = $0
+        }
+    }
+    
+    
+    @ViewBuilder
+    private func movieRow(for movie: Movie) -> some View {
+        Button {
+        } label: {
+            Text(movie.title)
+                .font(AppFonts.headline)
+                .foregroundColor(AppColors.textPrimary)
+                .padding(.bottom, AppLayout.defaultPadding)
+                .padding(.horizontal, AppLayout.defaultPadding)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 #Preview {
     SearchView()
+}
+
+fileprivate struct ContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = .zero
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
 }
