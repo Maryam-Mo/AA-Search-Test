@@ -38,6 +38,7 @@ struct SearchView: View {
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .tint(AppColors.textPrimary)
     }
 }
 
