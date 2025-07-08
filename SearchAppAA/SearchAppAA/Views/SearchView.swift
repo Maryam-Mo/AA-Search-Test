@@ -22,7 +22,11 @@ struct SearchView: View {
                         HeaderView(viewModel: viewModel, height: half)
                         
                         ZStack(alignment: .top) {
-                            if !viewModel.movies.isEmpty {
+                            if viewModel.movies.isEmpty {
+                                if !viewModel.history.isEmpty {
+                                    HistoryListView(viewModel: viewModel, height: half)
+                                }
+                            } else {
                                 MovieListView(viewModel: viewModel, height: half)
                             }
                         }
@@ -165,6 +169,7 @@ struct MovieListView: View {
     @ViewBuilder
     private func movieRow(for movie: Movie) -> some View {
         Button {
+            viewModel.addHistory(movie: movie)
             selectedMovie = movie
         } label: {
             Text(movie.title)
@@ -195,6 +200,72 @@ struct ShowMoreButton: View {
         }
         .padding(.bottom, AppLayout.defaultPadding)
         .padding(.horizontal, AppLayout.defaultPadding)
+    }
+}
+
+struct HistoryListView: View {
+    @ObservedObject var viewModel: SearchViewModel
+    let height: CGFloat
+    @State private var selectedMovie: Movie?
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                Color.clear
+                Text("History")
+                    .font(AppFonts.title16)
+                    .foregroundColor(AppColors.textPrimary)
+                    .padding(.bottom, AppLayout.defaultPadding)
+                
+                ForEach(viewModel.history) { entry in
+                    historyRow(entry: entry)
+                }
+            }
+        }
+        .frame(maxHeight: height)
+        .background(AppColors.background)
+        .cornerRadius(AppLayout.cornerRadius)
+        .background(
+            Group {
+                if let movie = selectedMovie {
+                    NavigationLink(
+                        destination: DetailView(movie: movie),
+                        isActive: Binding(
+                            get: { selectedMovie != nil },
+                            set: { if !$0 { selectedMovie = nil } }
+                        ),
+                        label: { EmptyView() }
+                    )
+                    .hidden()
+                }
+            }
+        )
+    }
+    
+    @ViewBuilder
+    private func historyRow(entry: SearchHistory) -> some View {
+        Button {
+            selectedMovie = entry.movie
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(entry.movie.title)
+                        .font(AppFonts.subheadline)
+                        .foregroundColor(AppColors.textPrimary)
+                    Text(DateFormatter.localizedString(from: entry.date, dateStyle: .long, timeStyle: .short))
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(AppColors.textSecondary)
+            }
+            .padding(.vertical, AppLayout.defaultPadding)
+        }
+        .buttonStyle(.plain)
+        
+        Divider()
+            .background(AppColors.dividerColor)
     }
 }
 
