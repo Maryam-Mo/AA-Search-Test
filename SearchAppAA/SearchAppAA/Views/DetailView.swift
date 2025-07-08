@@ -21,6 +21,21 @@ struct DetailView: View {
             .ignoresSafeArea(.keyboard)
             .padding(.horizontal, AppLayout.defaultPadding)
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("BACK")
+                            .font(AppFonts.subheadline)
+                    }
+                    .foregroundColor(.white)
+                }
+            }
+        }
     }
 }
 
@@ -37,7 +52,7 @@ private struct TitleView: View {
 
 private struct HeaderSection: View {
     let title: String
-
+    
     var body: some View {
         VStack(spacing: 20) {
             IndicatorView()
