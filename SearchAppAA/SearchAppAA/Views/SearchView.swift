@@ -143,12 +143,28 @@ struct MovieListView: View {
         .onPreferenceChange(ContentHeightKey.self) {
             contentHeight = $0
         }
+        .background(
+            Group {
+                if let movie = selectedMovie {
+                    NavigationLink(
+                        destination: DetailView(movie: movie),
+                        isActive: Binding(
+                            get: { selectedMovie != nil },
+                            set: { if !$0 { selectedMovie = nil } }
+                        ),
+                        label: { EmptyView() }
+                    )
+                    .hidden()
+                }
+            }
+        )
     }
     
     
     @ViewBuilder
     private func movieRow(for movie: Movie) -> some View {
         Button {
+            selectedMovie = movie
         } label: {
             Text(movie.title)
                 .font(AppFonts.headline)
